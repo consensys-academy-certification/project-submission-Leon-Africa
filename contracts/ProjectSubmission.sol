@@ -17,6 +17,10 @@ contract ProjectSubmission {
     event submit_project_message(string message);
     string submit_project_success = "Project Successfully submitted!";
 
+    event submit_review_message(string message);
+    string submit_review_success = "Project Review Status succefuly updated!";
+    string submit_review_error = "Error: Review status must either be Rejected or Approved.";
+
     modifier onlyOwner(){
       require(msg.sender == owner, "You are not the owner of this contract!");
       _;
@@ -87,13 +91,21 @@ contract ProjectSubmission {
     
     }
     
-    // function disableProject... { // Step 3
-    //   ...
-    // }
+    function disableProject (bytes32 document_hash) public onlyOwner{ // Step 3
+    projects[document_hash].status = ProjectStatus.Disabled;
+    }
     
-    // function reviewProject... { // Step 3
-    //   ...
-    // }
+    function reviewProject (bytes32 document_hash, ProjectStatus project_status) public onlyOwner {
+    require(projects[document_hash].status == ProjectStatus.Waiting,"A project must be in waiting status in order to be reviewed.");
+    if(project_status == ProjectStatus.Approved || project_status == ProjectStatus.Rejected ){
+        projects[document_hash].status = ProjectStatus(project_status);
+        emit submit_review_message(submit_review_success);
+    }else{
+        emit submit_review_message(submit_review_error);
+    }
+    
+
+    }
     
     // function donate... { // Step 4
     //   ...
