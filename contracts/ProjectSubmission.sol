@@ -14,27 +14,31 @@ contract ProjectSubmission {
     string message_unavaliable = "Succesfully changed univeristy status to unavaliable!";
     string message_immutable = "Cannot undo immutable action of set to unavaliable - please contact info@universityregitration.org";
    
+    event submit_project_message(string message);
+    string submit_project_success = "Project Successfully submitted!";
 
     modifier onlyOwner(){
       require(msg.sender == owner, "You are not the owner of this contract!");
       _;
     }
       
-    struct University { // Step 1
+    struct University {
         bool available;
         bool isregistered;
         uint balance;
     }
     mapping(address => University) public universities;
     
-    // enum ProjectStatus { ... } // Step 2
-    // struct Project { // Step 2
-    //     ...author...
-    //     ...university...
-    //     ...status...
-    //     ...balance...
-    // }
-    // ...projects... // Step 2 (state variable)
+    enum ProjectStatus { Waiting, Rejected, Approved, Disabled }
+    
+    struct Project {
+         address payable author;
+         address payable university;
+         ProjectStatus status;
+         uint balance;
+     }
+    
+    mapping (bytes32 => Project) public projects;
 
     
     function registerUniversity(address university_address) public onlyOwner{ // Step 1
@@ -71,9 +75,17 @@ contract ProjectSubmission {
 
     }
     
-    // function submitProject... { // Step 2 and 4
-    //   ...
-    // }
+    function submitProject(bytes32 document_hash, address payable university_address) public payable { // Step 2 and 4
+    require(msg.value >= 1 ether, "A value of atleast 1 ether is required to submit a project.");
+    //A university must be registred to accept project submissions
+    require(universities[university_address].isregistered, "Projects can only be submitted to registred universities.");
+    //A university must be available to accept project submissions
+    require(universities[university_address].available, "Projects can only be submitted to available universities.");
+    Project memory project = Project(msg.sender, university_address, ProjectStatus.Waiting, 0);
+    projects[document_hash] = project;
+    emit submit_project_message(submit_project_success);
+    
+    }
     
     // function disableProject... { // Step 3
     //   ...
