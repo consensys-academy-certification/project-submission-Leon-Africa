@@ -4,14 +4,14 @@ contract ProjectSubmission { // Step 1
 
    // ...owner... // Step 1 (state variable)
     // ...ownerBalance... // Step 4 (state variable)
-    modifier onlyOwner() { // Step 1
+   // modifier onlyOwner() { // Step 1
   //    ...
-    }
+    //}
     
-    struct University { // Step 1
+   // struct University { // Step 1
   //      ...available...
  //       ...balance...
-    }
+   // }
  //   ...universities... // Step 1 (state variable)
     
     // enum ProjectStatus { ... } // Step 2
@@ -23,13 +23,13 @@ contract ProjectSubmission { // Step 1
     // }
     // ...projects... // Step 2 (state variable)
     
-    function registerUniversity... { // Step 1
+   // function registerUniversity() public { // Step 1
    //   ...
-    }
+  //  }
     
-    function disableUniversity... { // Step 1
+  //  function disableUniversity() public{ // Step 1
    //   ...
-    }
+  //  }
     
     // function submitProject... { // Step 2 and 4
     //   ...
