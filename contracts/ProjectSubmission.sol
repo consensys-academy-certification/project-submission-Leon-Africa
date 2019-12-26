@@ -1,4 +1,4 @@
-pragma... // Step 1
+pragma solidity ^0.5.0;
 
 contract ProjectSubmission { // Step 1
 
