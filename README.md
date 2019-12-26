@@ -1,7 +1,8 @@
 # Assignment Description
-In this coding assignment you will have to implement the smart contract **Project Submission** and a script using **web3.js** following the instructions provided in this document.
 
 [![Build Status](https://travis-ci.com/consensys-academy-certification/project-submission-Leon-Africa.svg?branch=development)](https://travis-ci.com/consensys-academy-certification/project-submission-Leon-Africa)
+
+In this coding assignment you will have to implement the smart contract **Project Submission** and a script using **web3.js** following the instructions provided in this document.
 
 Only the files **ProjectSubmission.sol** and **app.helper.js** should be modified for this assignment, otherwise your answer may be disqualified. 
 
