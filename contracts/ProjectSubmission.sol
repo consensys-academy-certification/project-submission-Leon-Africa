@@ -9,6 +9,7 @@ contract ProjectSubmission {
     event avaliable_status_message(string message);
     event submit_project_message(string message);
     event submit_review_message(string message);
+    event withdrawl_success(string message);
     
 
     modifier onlyOwner(){
@@ -124,11 +125,46 @@ contract ProjectSubmission {
     ownerBalance += msg.value * 1 / 10;
     }
     
-    // function withdraw... { // Step 5
-    //   ...
-    // }
     
-    // function withdraw... {  // Step 5 (Overloading Function)
-    //   ...
-    // }
+    //Only Universities and contract owners can withdraw using this function
+    function withdraw() public payable { // Step 5
+   
+    
+    //The contract owner wants to withdraw
+    if(msg.sender == owner){
+      uint amount = ownerBalance;
+      require(amount > 0, "You have no funds to withdraw");
+      ownerBalance = 0;
+      msg.sender.transfer(amount);
+      emit withdrawl_success("Withdrawl Successful!");
+    }
+    //If university is registered then it is a university making the call
+    //Universities are not able to deregister - only disable
+    //A University wants to withdraw
+    else if(universities[msg.sender].isregistered){
+      uint amount = universities[msg.sender].balance;
+      require(amount > 0, "You have no funds to withdraw");
+      universities[msg.sender].balance = 0;
+      msg.sender.transfer(amount);
+      emit withdrawl_success("Withdrawl Successful!");
+    }else{
+        revert("You are not permitted to use this withdraw function!");
+    }
+    
+    }
+    
+    //Only students can withdraw with this function
+    function withdraw(bytes32 document_hash) public payable {  // Step 5 (Overloading Function)
+    
+    //A student wants to withdraw
+      if(msg.sender == projects[document_hash].author){
+          uint amount = projects[document_hash].balance;
+          projects[document_hash].balance = 0;
+          msg.sender.transfer(amount);
+          emit withdrawl_success("Withdrawl Successful!");
+
+      }else{
+       revert("You are not permitted to use this withdraw function!");
+    }
+    }
 }
