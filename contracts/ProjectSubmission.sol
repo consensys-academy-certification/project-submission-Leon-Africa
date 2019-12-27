@@ -3,7 +3,7 @@ pragma solidity ^0.5.0;
 contract ProjectSubmission {
 
   address payable public owner = msg.sender;
-    // ...ownerBalance... // Step 4 (state variable)
+  uint public ownerBalance;
 
     event registration_message(string message);
     string message_success = "Succesfully Registred!";
@@ -85,8 +85,10 @@ contract ProjectSubmission {
     require(universities[university_address].isregistered, "Projects can only be submitted to registred universities.");
     //A university must be available to accept project submissions
     require(universities[university_address].available, "Projects can only be submitted to available universities.");
+
     Project memory project = Project(msg.sender, university_address, ProjectStatus.Waiting, 0);
     projects[document_hash] = project;
+    ownerBalance += 1 ether;
     emit submit_project_message(submit_project_success);
     
     }
@@ -107,9 +109,15 @@ contract ProjectSubmission {
 
     }
     
-    // function donate... { // Step 4
-    //   ...
-    // }
+    function donate(bytes32 document_hash) public payable { // Step 4
+     require(projects[document_hash].status == ProjectStatus.Approved,"A project must be in approved status in order accept donations.");
+     //70% to the project
+     projects[document_hash].balance += msg.value * 7 / 10;
+     //20% to the university
+     //universities[projects[document_hash].university].balance = msg.value * 2 / 10;
+    //10% to the university
+    ownerBalance += msg.value * 1 / 10;
+    }
     
     // function withdraw... { // Step 5
     //   ...
