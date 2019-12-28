@@ -59,7 +59,6 @@ let App = {
     // Return the owner address
     async readOwnerAddress(){
         App.contractOwner = await App.contract.owner({from: web3.eth.defaultAccount})
-        .on('error', console.error);
         return App.contractOwner;
     },
 
@@ -67,7 +66,6 @@ let App = {
     // Return the owner balance
     async readOwnerBalance(){
         let owner_balance = await App.contract.ownerBalance({from: web3.eth.defaultAccount})
-        .on('error', console.error);
         owner_balance = web3.utils.fromWei(owner_balance.toString(), "ether" );
         return owner_balance;
     },
@@ -77,7 +75,6 @@ let App = {
     // Return the state object 
     async readUniversityState(account){
         let university_state = await App.contract.universities(account, {from: web3.eth.defaultAccount})
-        .on('error', console.error);
         return university_state;
     },
 
@@ -98,7 +95,6 @@ let App = {
     // Return the transaction object
     async disableUniversity(account){
         let disable_university = await App.contract.disableUniversity(account,  {from: web3.eth.defaultAccount, gas: gasAmount})
-        .on('error', console.error);
         return disable_university;
     },
 
@@ -130,7 +126,6 @@ let App = {
     // Return the transaction object
     async readProjectState(projectHash){
             let read_project_state = await App.contract.projects(projectHash, {from: web3.eth.defaultAccount})
-            .on('error', console.error);
             return read_project_state;
     },
 
