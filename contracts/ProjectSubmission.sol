@@ -10,22 +10,22 @@ contract ProjectSubmission {
     event submit_project_message(string message);
     event submit_review_message(string message);
     event withdrawl_success(string message);
-    
+
 
     modifier onlyOwner(){
       require(msg.sender == owner, "You are not the owner of this contract!");
       _;
     }
-      
+
     struct University {
         bool available;
         bool isregistered;
         uint balance;
     }
     mapping(address => University) public universities;
-    
+
     enum ProjectStatus { Waiting, Rejected, Approved, Disabled }
-    
+
     struct Project {
          address payable author;
          address payable university;
@@ -33,37 +33,18 @@ contract ProjectSubmission {
          bool issubmitted;
          uint balance;
      }
-    
+
     mapping (bytes32 => Project) public projects;
 
-    
-    function registerUniversity(address university_address) public onlyOwner{ // Step 1
-     
-    //A university that is already registred cannot register again
-     if (universities[university_address].isregistered){
-         
-         if(!universities[university_address].available){
-           //Has been disabled for project submission
-           revert("Cannot undo immutable action of setting University to unavaliable");
-         }
-         
-         //Already registred
-         revert("This University has already been registred.");
-        
-     }
-     //If the university is not yet registered then register it. Booleans are false by default so an unregistred university cannot be avaliable
-     else if (!universities[university_address].isregistered){
-          University memory university = University(true, true, 0);
-          universities[university_address] = university;
-          emit registration_message("Succesfully Registred!");
 
-     }else {
-         revert("Failed Registration - please contact info@universityregitration.org");
-     }
-     
+    function registerUniversity(address university_address) public onlyOwner{ // Step 1
+
+      University memory university = University(true, true, 0);
+      universities[university_address] = university;
+      emit registration_message("Succesfully Registred!");
 
     }
-    
+
     function disableUniversity(address university_address) public onlyOwner {
        //Already disabled
       if(!universities[university_address].available){
@@ -73,7 +54,7 @@ contract ProjectSubmission {
          emit avaliable_status_message("This University has been disabled for project submissions");
       }
     }
-    
+
     function submitProject(bytes32 document_hash, address payable university_address) public payable { // Step 2 and 4
     require(msg.value >= 1 ether, "A value of atleast 1 ether is required to submit a project.");
     //A university must be registred to accept project submissions
@@ -84,19 +65,19 @@ contract ProjectSubmission {
     if(projects[document_hash].issubmitted){
         revert("This project has already been submitted.");
     }
-   
-    
+
+
     Project memory project = Project(msg.sender, university_address, ProjectStatus.Waiting, true, 0);
     projects[document_hash] = project;
     ownerBalance += 1 ether;
     emit submit_project_message("Project Succesfully submitted!");
-    
+
     }
-    
+
     function disableProject (bytes32 document_hash) public onlyOwner{ // Step 3
     projects[document_hash].status = ProjectStatus.Disabled;
     }
-    
+
     function reviewProject (bytes32 document_hash, ProjectStatus project_status) public onlyOwner {
     if (projects[document_hash].status == ProjectStatus.Disabled){
             revert("This project has been disabled and can no longer be reviewed.");
@@ -108,14 +89,15 @@ contract ProjectSubmission {
     }else{
         emit submit_review_message("Error submitting Project review!");
     }
-    
+
 
     }
-    
+
     function donate(bytes32 document_hash) public payable { // Step 4
      if (projects[document_hash].status == ProjectStatus.Disabled){
        revert("This project has been disabled and is no longer accepting donations.");
    }
+
     require(projects[document_hash].status == ProjectStatus.Approved,"A project must be approved in order accept donations. Please review.");
      //70% to the project
      projects[document_hash].balance += msg.value * 7 / 10;
@@ -124,12 +106,12 @@ contract ProjectSubmission {
     //10% to the university
     ownerBalance += msg.value * 1 / 10;
     }
-    
-    
+
+
     //Only Universities and contract owners can withdraw using this function
     function withdraw() public payable { // Step 5
-   
-    
+
+
     //The contract owner wants to withdraw
     if(msg.sender == owner){
       uint amount = ownerBalance;
@@ -138,10 +120,9 @@ contract ProjectSubmission {
       msg.sender.transfer(amount);
       emit withdrawl_success("Withdrawl Successful!");
     }
-    //If university is registered then it is a university making the call
-    //Universities are not able to deregister - only disable
+
     //A University wants to withdraw
-    else if(universities[msg.sender].isregistered){
+    else if(!universities[msg.sender].available || universities[msg.sender].available){
       uint amount = universities[msg.sender].balance;
       require(amount > 0, "You have no funds to withdraw");
       universities[msg.sender].balance = 0;
@@ -150,21 +131,14 @@ contract ProjectSubmission {
     }else{
         revert("You are not permitted to use this withdraw function!");
     }
-    
-    }
-    
-    //Only students can withdraw with this function
-    function withdraw(bytes32 document_hash) public payable {  // Step 5 (Overloading Function)
-    
-    //A student wants to withdraw
-      if(msg.sender == projects[document_hash].author){
-          uint amount = projects[document_hash].balance;
-          projects[document_hash].balance = 0;
-          msg.sender.transfer(amount);
-          emit withdrawl_success("Withdrawl Successful!");
 
-      }else{
-       revert("You are not permitted to use this withdraw function!");
     }
+
+    //A student wants to withdraw
+    function withdraw(bytes32 document_hash) public payable {  // Step 5 (Overloading Function)
+    uint amount = projects[document_hash].balance;
+    projects[document_hash].balance = 0;
+    msg.sender.transfer(amount);
+    emit withdrawl_success("Withdrawl Successful!");
     }
 }
