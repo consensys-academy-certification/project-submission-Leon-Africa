@@ -134,7 +134,6 @@ let App = {
     //   - a projectHash and a number (amount)
     // Return the transaction object
     async donate(projectHash, amount){
-        amount = web3.utils.toWei(web3.utils.toBN(amount));
         let donation = await App.contract.donate(projectHash, {from: web3.eth.defaultAccount, gas: gasAmount, value: amount})
         .on('error', console.error);
         return donation;
